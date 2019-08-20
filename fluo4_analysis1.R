@@ -16,22 +16,16 @@ avg_bk <- rowMeans(well7bkgd3[,2:4])
 fluo <- well7df[,2:ncol(well7df)]-avg_bk
 
 #determine baseline and normalize each cell to its baseline
-base <- colMeans(fluo[2:6,])
-basedf <- data.frame()
 ratio <- data.frame(fluo)
 ratio <- sweep(fluo,MARGIN=2,FUN = "/",STATS=colMeans(fluo[2:6,]))
 
 #put all required elements into a single data table
 ratio_t <- data.frame(cbind(t,tsec,ratio))
 
-#make plots of data
-ggplot(data=ratio_t, aes(x=tsec, y=Mean1))+geom_line()+geom_point()
-cellid <- colnames(ratio_t)
-
 #extract information from each cell
 #first create a list of cell numbers
 cellnum <- as.numeric(gsub("Mean", "", colnames(ratio)))
-
+#then get peaks from time windows
 peak1 <- vector("double", ncol(ratio))
 cap1 <- vector("double",ncol(ratio))
 hik1 <- vector("double",ncol(ratio))
@@ -40,11 +34,11 @@ for (i in seq_along(ratio)) {
     cap1[i] <- max(ratio[71:85,i])
     hik1[i] <- max(ratio[91:105,i])
 }
+#put all dta together in a single frame
 allpeaks <- data.frame(cbind(cellnum,peak1,cap1,hik1))
 
 
 #making individual plots as separate png files 
-#test with different way of creating column names: WORKS! 8-11-19
 
 dir.create("plots5")
 colNames <- names(ratio_t)
